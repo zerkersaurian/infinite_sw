@@ -11,16 +11,37 @@ class StarwarList extends StatefulWidget {
 class _StarwarListState extends State<StarwarList> {
   List<String> sw_image = [];
   List<People> sw_people = [];
-  int i = 1;
+  int page = 1;
+  ScrollController _scrollController = new ScrollController();
+
   @override
   void initState() {
     super.initState();
-    fetchPeople(1);
+    fetchPeople(page);
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        setState(() {
+          page += 1;
+          if (page > 9) {
+            page %= 9;
+          }
+          fetchPeople(page);
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      controller: _scrollController,
       itemCount: sw_people.length,
       itemBuilder: (BuildContext context, int index) {
         return Container(
@@ -35,19 +56,16 @@ class _StarwarListState extends State<StarwarList> {
   }
 
   fetchPeople(page) async {
-    int x = 0;
     var response = await Dio().get('https://swapi.dev/api/people/?page=$page');
     List<dynamic> results = response.data['results'];
-
     var res = results.map((it) => People.fromJson(it)).toList();
-
     setState(() {
       sw_people = sw_people + res;
-      for (x = i; x <= res.length + 1; x++) {
+      for (int i = 0; i < res.length; i++) {
         sw_image.add(
-            'https://starwars-visualguide.com/assets/img/characters/$x.jpg');
+            'https://starwars-visualguide.com/assets/img/characters/${res[i].id}.jpg');
       }
-      i += x;
+      print(sw_people.length);
     });
   }
 }
