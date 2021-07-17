@@ -45,9 +45,8 @@ class _StarwarListState extends State<StarwarList> {
       controller: _scrollController,
       itemCount: sw_people.length,
       itemBuilder: (BuildContext context, int index) {
-        return Container(
+        return Card(
           color: Colors.lightBlue[color[index]],
-          height: 750,
           child: Column(children: [
             Padding(padding: EdgeInsets.only(top: 35)),
             Text('Name : ${sw_people[index].name}',
@@ -63,6 +62,7 @@ class _StarwarListState extends State<StarwarList> {
                     fontSize: 35)),
             Padding(padding: EdgeInsets.only(bottom: 15)),
             Image.network(sw_image[index]),
+            Padding(padding: EdgeInsets.only(bottom: 40))
           ]),
         );
       },
