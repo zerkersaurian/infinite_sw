@@ -11,6 +11,7 @@ class StarwarList extends StatefulWidget {
 class _StarwarListState extends State<StarwarList> {
   List<String> sw_image = [];
   List<People> sw_people = [];
+  List<int> color = [];
   int page = 1;
   ScrollController _scrollController = new ScrollController();
 
@@ -45,9 +46,22 @@ class _StarwarListState extends State<StarwarList> {
       itemCount: sw_people.length,
       itemBuilder: (BuildContext context, int index) {
         return Container(
-          height: 700,
+          color: Colors.lightBlue[color[index]],
+          height: 750,
           child: Column(children: [
-            Text('name : ${sw_people[index].name}'),
+            Padding(padding: EdgeInsets.only(top: 35)),
+            Text('Name : ${sw_people[index].name}',
+                style: TextStyle(
+                    color: Colors.grey[900],
+                    decoration: TextDecoration.none,
+                    fontSize: 45)),
+            Padding(padding: EdgeInsets.only(top: 10)),
+            Text('Gender : ${sw_people[index].gender}',
+                style: TextStyle(
+                    color: Colors.grey[800],
+                    decoration: TextDecoration.none,
+                    fontSize: 35)),
+            Padding(padding: EdgeInsets.only(bottom: 15)),
             Image.network(sw_image[index]),
           ]),
         );
@@ -56,14 +70,16 @@ class _StarwarListState extends State<StarwarList> {
   }
 
   fetchPeople(page) async {
-    var response = await Dio().get('https://swapi.dev/api/people/?page=$page');
-    List<dynamic> results = response.data['results'];
-    var res = results.map((it) => People.fromJson(it)).toList();
+    var res = await getjson(page);
     setState(() {
       sw_people = sw_people + res;
       for (int i = 0; i < res.length; i++) {
         sw_image.add(
             'https://starwars-visualguide.com/assets/img/characters/${res[i].id}.jpg');
+        if (((i + 1) * 100) % 1000 == 0)
+          color.add(50);
+        else
+          color.add(((i + 1) * 100) % 1000);
       }
       print(sw_people.length);
     });
